@@ -30,7 +30,7 @@ public class FracCalcTestFinalExtraCredit {
     @Test public void ErrorHandling3() {assertTrue(FracCalc.produceAnswer("1 +2").toLowerCase().contains("error"));}
     @Test public void ErrorHandling4() {assertTrue(FracCalc.produceAnswer("5_ + 3_1/2").toLowerCase().contains("error"));}
     @Test public void ErrorHandling5() {assertTrue(FracCalc.produceAnswer("5_2/ + 3").toLowerCase().contains("error"));}
-    @Test public void ErrorHandling6() {assertTrue(FracCalc.produceAnswer("Vikings Rule!").toLowerCase().contains("error"));}
+    @Test public void ErrorHandling6() {assertTrue(FracCalc.produceAnswer("                     ").toLowerCase().contains("error"));}
     @Test public void ErrorHandling7() {assertTrue(FracCalc.produceAnswer("").toLowerCase().contains("error"));}
     @Test public void ErrorHandling8() {assertTrue(FracCalc.produceAnswer("1/2 + 1_2").toLowerCase().contains("error"));}
     @Test public void ErrorHandling9() {assertTrue(FracCalc.produceAnswer("_1/2 - 13").toLowerCase().contains("error"));}

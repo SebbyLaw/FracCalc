@@ -22,9 +22,6 @@ public class FracCalc {
     // DO NOT EDIT THIS HEADER!!! All unit tests run off this method
     public static String produceAnswer(String input) {
         if (!isValidOperation(input)) return "ERROR: Invalid input";
-        // TODO: Parentheses
-        
-        
         return toMixedNumberForm(evaluate(input));
     }
     
@@ -267,19 +264,14 @@ public class FracCalc {
     
     // Checks if the string input is a valid FracCalc operation
     private static boolean isValidOperation(String input) {
-        // minimal equation "1 + 1" is 5 characters. Any less is invalid
-        if (input.length() < 5) return false;
-    
+        // TODO: Fix this
         // make sure the number of opening and closing parenthesis are equal
         if (countCharIn(input, '(') != countCharIn(input, ')')) return false;
-        
-        // if trailing spaces
-        if (input.charAt(0) == ' ' || input.charAt(input.length() - 1) == ' ') return false;
         
         String[] inputTerms = input.split(" ");
         
         // The terms must be in the format {operand operator operand} (odd number of terms)
-        if (inputTerms.length % 2 == 0) return false;
+        if (inputTerms.length % 2 == 0 || inputTerms.length < 3) return false;
         
         /* termNumber is the index of the term split by spaces
         even termNumber indicates operands
@@ -304,13 +296,6 @@ public class FracCalc {
                 term = cutOffFront(term, '(');
                 if (countCharIn(term, '(') > 0) return false;
                 
-                // make sure there are no duplicate non-digit valid chars (except parenthesis)
-                for (int i = 0; i < 3; i++) {
-                    char c = validChars[i];
-                    if (countCharIn(term.substring(term.indexOf(c) + 1), c) > 0) return false;
-                    // if the term contains multiple of c
-                }
-                
                 // make sure there are ONLY valid characters/digits
                 for (int i = 0; i < term.length(); i++) {
                     char c = term.charAt(i);
@@ -324,7 +309,6 @@ public class FracCalc {
                     if (term.length() == 0) return false;
                     // term MUST continue after the negative sign
                 }
-                
                 
                 if (!charInArray(term.charAt(0), integers)) return false;
                 
@@ -367,7 +351,6 @@ public class FracCalc {
                         term = cutOffFront(term, ')');
                     }
                 }
-                
                 // by now the string has to be empty
                 if (term.length() != 0) return false;
                 
@@ -378,6 +361,7 @@ public class FracCalc {
             }
         }
         
+        // check if division by zero
         int[][] operands = extractOperands(input);
         char[] operators = extractOperators(input);
         for (int i = 0; i < operators.length; i++) {
