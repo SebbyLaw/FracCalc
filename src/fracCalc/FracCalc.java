@@ -22,6 +22,9 @@ public class FracCalc {
     // DO NOT EDIT THIS HEADER!!! All unit tests run off this method
     public static String produceAnswer(String input) {
         if (!isValidOperation(input)) return "ERROR: Invalid input";
+        
+        // TODO: Parentheses
+        
         return toMixedNumberForm(evaluate(input));
     }
     
@@ -72,30 +75,6 @@ public class FracCalc {
         return removedIndex(operands, index + 1);
     }
     
-    // returns the operands of a string expression
-    private static int[][] extractOperands(String expression){
-        String[] expressionTerms = expression.split(" ");
-        int[][] operands = new int[expressionTerms.length / 2 + 1][2];
-        for (int i = 0; i < expressionTerms.length; i++) {
-            if (i % 2 == 0){
-                operands[i / 2] = toFractionForm(expressionTerms[i]);
-            }
-        }
-        return operands;
-    }
-    
-    // returns the operators of a string expression
-    private static char[] extractOperators(String expression){
-        String[] expressionTerms = expression.split(" ");
-        char[] operators = new char[expressionTerms.length / 2];
-        for (int i = 0; i < expressionTerms.length; i++) {
-            if (i % 2 == 1){
-                operators[i / 2] = (expressionTerms[i]).charAt(0);
-            }
-        }
-        return operators;
-    }
-    
     // multiplies one number with another in the form of fraction arrays
     private static int[] multiplication(int[] firstFactor, int[] secondFactor){
         int[] product = new int[2];
@@ -134,6 +113,30 @@ public class FracCalc {
         subtrahend[0] *= -1;
         // addition but negative
         return addition(minuend, subtrahend);
+    }
+    
+    // returns the operands of a string expression
+    private static int[][] extractOperands(String expression){
+        String[] expressionTerms = expression.split(" ");
+        int[][] operands = new int[expressionTerms.length / 2 + 1][2];
+        for (int i = 0; i < expressionTerms.length; i++) {
+            if (i % 2 == 0){
+                operands[i / 2] = toFractionForm(expressionTerms[i]);
+            }
+        }
+        return operands;
+    }
+    
+    // returns the operators of a string expression
+    private static char[] extractOperators(String expression){
+        String[] expressionTerms = expression.split(" ");
+        char[] operators = new char[expressionTerms.length / 2];
+        for (int i = 0; i < expressionTerms.length; i++) {
+            if (i % 2 == 1){
+                operators[i / 2] = (expressionTerms[i]).charAt(0);
+            }
+        }
+        return operators;
     }
     
     /**
