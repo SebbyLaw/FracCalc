@@ -38,19 +38,26 @@ public class FracCalc {
             for (int i = 0; i < operators.length; i++) {
                 if (operators[i] == '*' || operators[i] == '/') {
                     operands = doOperation(operands, operators, i);
-                    operators = removeIndex(operators, i--);
+                    operators = removedIndex(operators, i--);
                 }
             }
         }
         // run over every operator after
         for (int i = 0; i < operators.length; i++) {
             operands = doOperation(operands, operators, i);
-            operators = removeIndex(operators, i--);
+            operators = removedIndex(operators, i--);
         }
         return operands[0];
     }
     
-    // does one operation. You must manually decrement the operators array (using Objects would solve this!)
+    /**
+     * Does one operation. You must manually decrement the operators array
+     * (using Objects would solve this!)
+     * @param operands the operands array
+     * @param operators the operators array
+     * @param index the index of the operator array to evaluate
+     * @return the updated operand array
+     */
     private static int[][] doOperation(int[][] operands, char[] operators, int index){
         char op = operators[index];
         if (op == '*'){
@@ -62,7 +69,7 @@ public class FracCalc {
         } else { // subtraction
             operands[index] = subtraction(operands[index], operands[index + 1]);
         }
-        return removeIndex(operands, index + 1);
+        return removedIndex(operands, index + 1);
     }
     
     // returns the operands of a string expression
@@ -162,10 +169,7 @@ public class FracCalc {
     private static int[] toFractionForm(String formatted){
         int[] fraction = new int[2];
         
-        formatted = cutOffFront(formatted, '(');
-        while (formatted.charAt(formatted.length() - 1) == ')') {
-            formatted = formatted.substring(0, formatted.length() - 1);
-        }
+        formatted = stripParentheses(formatted);
         
         boolean isNegative = formatted.indexOf('-') == 0;
         if (isNegative) formatted = formatted.substring(1);
@@ -199,7 +203,7 @@ public class FracCalc {
         }
     }
     
-    // if a string DOES NOT contain ANY character in a character array
+    // if a string contains ANY character in a character array
     private static boolean charInArray(char c, char[] characters){
         for (char character : characters){
             if (character == c) return true;
@@ -220,10 +224,13 @@ public class FracCalc {
         return string;
     }
     
-    // cuts off the front of the string, only takes in one char
-    private static String cutOffFront(String string, char cutoff) {
-        char[] c = {cutoff};
-        return cutOffFront(string, c);
+    // cuts off parentheses from a string
+    private static String stripParentheses(String string) {
+        string = cutOffFront(string, new char[]{'('});
+        while (string.charAt(string.length() - 1) == ')') {
+            string = string.substring(0, string.length() - 1);
+        }
+        return string;
     }
     
     // counts the number of a char in the string
@@ -235,17 +242,26 @@ public class FracCalc {
         return count;
     }
     
-    // returns the last index of a character in a string since String.lastIndexOf() is illegal :(
+    /**
+     * Returns the indexes of a character in relation to the operands array
+     * Does not work with spaces
+     * @param string the string to search
+     * @param c the character the string is searched for
+     */
     private static int[] indexesOf(String string, char c){
         int[] indexes = new int[countCharIn(string, c)];
+        
         for (int i = 0, j = 0; i < string.length(); i++) {
-            if (string.charAt(i) == c) indexes[j++] = i;
+            char character = string.charAt(i);
+            if (character == c){
+                indexes[j] = i;
+            } else if (character == ' ') j++;
         }
         return indexes;
     }
     
     // removes an index from a operand array
-    private static int[][] removeIndex(int[][] fractionArray, int index) {
+    private static int[][] removedIndex(int[][] fractionArray, int index) {
         int[][] shifted = new int[fractionArray.length - 1][2];
         for (int i = 0, j = 0; i < fractionArray.length; i++) {
             if (i != index) shifted[j++] = fractionArray[i];
@@ -253,18 +269,34 @@ public class FracCalc {
         return shifted;
     }
     
-    // removes an index from an operation array
-    private static char[] removeIndex(char[] operationArray, int index){
-        char[] shifted = new char[operationArray.length - 1];
-        for (int i = 0, j = 0; i < operationArray.length; i++) {
-            if (i != index) shifted[j++] = operationArray[i];
+    // removes an index from a operator array
+    private static char[] removedIndex(char[] operatorArray, int index){
+        char[] shifted = new char[operatorArray.length - 1];
+        for (int i = 0, j = 0; i < operatorArray.length; i++) {
+            if (i != index) shifted[j++] = operatorArray[i];
         }
         return shifted;
     }
     
+    // Returns an array from one index to another - similar to substring
+    private static int[][] subArray(int[][] array, int start, int end){
+        int[][] sub = new int[end - start][];
+        for (int i = start, j = 0; i < end; i++) {
+            sub[j++] = array[i];
+        }
+        return sub;
+    }
+    
+    // Checks if a string is only integers
+    private static boolean notInteger(String string){
+        if (string.length() == 0) return true; // cannot start as an empty string
+        char[] integers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+        string = cutOffFront(string, integers);
+        return string.length() != 0;
+    }
+    
     // Checks if the string input is a valid FracCalc operation
     private static boolean isValidOperation(String input) {
-        // TODO: Fix this
         // make sure the number of opening and closing parenthesis are equal
         if (countCharIn(input, '(') != countCharIn(input, ')')) return false;
         
@@ -273,86 +305,30 @@ public class FracCalc {
         // The terms must be in the format {operand operator operand} (odd number of terms)
         if (inputTerms.length % 2 == 0 || inputTerms.length < 3) return false;
         
-        /* termNumber is the index of the term split by spaces
-        even termNumber indicates operands
-        odd termNumber indicates operators.
-        
-        This for loop checks each term by what it is indicated to be by position.
-        */
+        // loop over terms
         for (int termNumber = 0; termNumber < inputTerms.length; termNumber++) {
             String term = inputTerms[termNumber];
             
             if (termNumber % 2 == 0){ // OPERAND TERMS
-                /*
-                if (!term.matches("\\(*-?\\d+(_\\d+/\\d+|/\\d+)?\\)*")) return false;
-                /*
-                This is the best way to do it, but regex is illegal :(
-                so it's hardcoded :)
-                 */
+                // remove parentheses and negative sign
+                term = stripParentheses(term);
+                if (term.charAt(0) == '-') term = term.substring(1);
                 
-                char[] validChars = {'-', '_', '/', '(', ')'};
-                char[] integers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+                String[] wholePart = term.split("_");
+                String[] fractionPart = wholePart[wholePart.length - 1].split("/");
                 
-                term = cutOffFront(term, '(');
-                if (countCharIn(term, '(') > 0) return false;
-                
-                // make sure there are ONLY valid characters/digits
-                for (int i = 0; i < term.length(); i++) {
-                    char c = term.charAt(i);
-                    if (!charInArray(c, validChars) && !charInArray(c, integers)) return false;
+                if (term.indexOf('_') == -1) { // if not mixed number
+                    if (fractionPart.length == 2){ // if fraction only
+                        for (String num : fractionPart) if (notInteger(num)) return false;
+                    } else if (notInteger(term)) return false;
+                } else { // if mixed number
+                    // whole number is integers
+                    if (notInteger(term.substring(0, term.indexOf('_')))) return false;
+                    // fraction parts are integers
+                    if (fractionPart.length == 2) { // if fraction only
+                        for (String num : fractionPart) if (notInteger(num)) return false;
+                    } else return false; // fraction must be length of 2
                 }
-                
-                if (countCharIn(term, '-') > 0) { // if term has a negative sign
-                    if (term.indexOf('-') != 0) return false; // if negative is not the first character
-                    term = term.substring(1);
-                    
-                    if (term.length() == 0) return false;
-                    // term MUST continue after the negative sign
-                }
-                
-                if (!charInArray(term.charAt(0), integers)) return false;
-                
-                term = cutOffFront(term, integers);
-                
-                // if not a whole integer number (or closing parenthesis
-                if (term.length() > 0) {
-                    if (countCharIn(term, '_') > 0){ // if mixed number
-                        if (term.indexOf('_') > 0) return false;
-                        
-                        term = term.substring(1);
-                        if (term.length() == 0) return false;
-                        // term MUST continue after the underscore
-                        
-                        if (!charInArray(term.charAt(0), integers)) return false;
-                        
-                        term = cutOffFront(term, integers);
-                        if (term.length() == 0) return false;
-                    }
-                    
-                    if (term.indexOf(')') == 0){
-                        term = cutOffFront(term, ')');
-                    } else {
-                        // the next char MUST be a divisional operator
-                        if (term.charAt(0) != '/') return false;
-                        term = term.substring(1);
-                        
-                        if (term.length() == 0) return false;
-                        // term MUST continue after the divisional operator
-                        
-                        // check to make sure denominator is NOT == 0
-                        int denominatorTotal = 0;
-                        for (int i = 0; i < term.length() - cutOffFront(term, integers).length(); i++) {
-                            // iterate over all integer characters and add them to the total
-                            denominatorTotal += Integer.parseInt(term.substring(i, i + 1));
-                        }
-                        if (denominatorTotal == 0) return false; // if all the denominator digits are 0
-                        
-                        term = cutOffFront(term, integers);
-                        term = cutOffFront(term, ')');
-                    }
-                }
-                // by now the string has to be empty
-                if (term.length() != 0) return false;
                 
             } else { // OPERATOR TERMS
                 if (term.length() > 1) return false;
@@ -364,12 +340,13 @@ public class FracCalc {
         // check if division by zero
         int[][] operands = extractOperands(input);
         char[] operators = extractOperators(input);
-        for (int i = 0; i < operators.length; i++) {
-            if (operators[i] == '/' && operands[i + 1][0] == 0) {
-                return false;
-            }
+        for (int[] operand : operands){
+            if (operand[1] == 0) return false;
         }
-        // if nothing raised an error, return true
-        return true;
+        for (int i = 0; i < operators.length; i++){
+            if (operators[i] == '/' && operands[i + 1][0] == 0) return false;
+        }
+        
+        return true; // if nothing raised an error, return true
     }
 }
