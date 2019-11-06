@@ -33,22 +33,18 @@ public class FracCalc {
      * @param expression the expression to be evaluated
      * @return the fraction represented as an integer array
      */
-    private static int[] evaluate(String expression){
+    private static int[] evaluate(String expression) {
+        char[][] priorityLevels = {{'*', '/'}, {'+', '-'}};
         int[][] operands = extractOperands(expression);
         char[] operators = extractOperators(expression);
-        // run over priority in order of operations first
-        while (charInArray('*', operators) || charInArray('/', operators)){
-            for (int i = 0; i < operators.length; i++) {
-                if (operators[i] == '*' || operators[i] == '/') {
-                    operands = doOperation(operands, operators, i);
-                    operators = removedIndex(operators, i--);
+        // run over priority in order of operations
+        for (char[] priority : priorityLevels) {
+            for (int j = 0; j < operators.length; j++) {
+                if (charInArray(operators[j], priority)) {
+                    operands = doOperation(operands, operators, j);
+                    operators = removedIndex(operators, j--);
                 }
             }
-        }
-        // run over every operator after
-        for (int i = 0; i < operators.length; i++) {
-            operands = doOperation(operands, operators, i);
-            operators = removedIndex(operators, i--);
         }
         return operands[0];
     }
