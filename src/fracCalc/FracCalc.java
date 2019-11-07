@@ -283,15 +283,6 @@ public class FracCalc {
         return shifted;
     }
     
-    // Returns an array from one index to another - similar to substring
-    private static int[][] subArray(int[][] array, int start, int end){
-        int[][] sub = new int[end - start][];
-        for (int i = start, j = 0; i < end; i++) {
-            sub[j++] = array[i];
-        }
-        return sub;
-    }
-    
     // Checks if a string is only integers
     private static boolean notInteger(String string){
         if (string.length() == 0) return true; // cannot start as an empty string
@@ -382,9 +373,9 @@ public class FracCalc {
     }
     
     // Separated operator error handling for isValidOperation
-    private static boolean isValidOperator(String term){
-        if (term.length() > 1) return false;
+    private static boolean isValidOperator(String operator){
+        if (operator.length() > 1) return false;
         char[] validOperators = {'*', '/', '+', '-'};
-        return charInArray(term.charAt(0), validOperators);
+        return charInArray(operator.charAt(0), validOperators);
     }
 }
