@@ -221,7 +221,7 @@ public class FracCalc {
             fraction[1] = Math.abs(fraction[1]);
         }
         for (int i = Math.max(fraction[0], fraction[1]); i > 1; i--) {
-            while (fraction[0] % i == 0 && fraction[1] % i == 0) {
+            if (fraction[0] % i == 0 && fraction[1] % i == 0) {
                 fraction[0] /= i;
                 fraction[1] /= i;
             }
