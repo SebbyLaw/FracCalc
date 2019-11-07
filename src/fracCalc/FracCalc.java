@@ -22,18 +22,41 @@ public class FracCalc {
     // DO NOT EDIT THIS HEADER!!! All unit tests run off this method
     public static String produceAnswer(String input) {
         if (!isValidOperation(input)) return "ERROR: Invalid input";
+    
+        while (input.contains(")")) { // while parentheses exist
+            input = doParentheses(input);
+        }
         
-        // TODO: Parentheses
+        return (evaluate(input));
+    }
+    
+    private static String doParentheses(String expression){
+        boolean indexesFound = false;
+        int openingIndex = 0;
+        int closingIndex = expression.length();
         
-        return toMixedNumberForm(evaluate(input));
+        // a for loop with break would be better, but apparently breaking is evil
+        int i = 0;
+        while (!indexesFound) {
+            char character = expression.charAt(i);
+            if (character == '(') openingIndex = i;
+            else if (character == ')') {
+                closingIndex = i;
+                indexesFound = true;
+            }
+            i++;
+        }
+        
+        String nested = evaluate(expression.substring(openingIndex, closingIndex));
+        return expression.substring(0, openingIndex) + nested + expression.substring(closingIndex + 1);
     }
     
     /**
      * Evaluates an expression ignoring parentheses
      * @param expression the expression to be evaluated
-     * @return the fraction represented as an integer array
+     * @return the fraction in mixed number string form
      */
-    private static int[] evaluate(String expression) {
+    private static String evaluate(String expression) {
         char[][] priorityLevels = {{'*', '/'}, {'+', '-'}};
         int[][] operands = extractOperands(expression);
         char[] operators = extractOperators(expression);
@@ -46,7 +69,7 @@ public class FracCalc {
                 }
             }
         }
-        return operands[0];
+        return toMixedNumberForm(operands[0]);
     }
     
     /**
@@ -226,8 +249,10 @@ public class FracCalc {
     // cuts off parentheses from a string
     private static String stripParentheses(String string) {
         string = cutOffFront(string, new char[]{'('});
-        while (string.charAt(string.length() - 1) == ')') {
-            string = string.substring(0, string.length() - 1);
+        if (string.length() > 0) {
+            while (string.charAt(string.length() - 1) == ')') {
+                string = string.substring(0, string.length() - 1);
+            }
         }
         return string;
     }
@@ -250,11 +275,11 @@ public class FracCalc {
     private static int[] indexesOf(String string, char c){
         int[] indexes = new int[countCharIn(string, c)];
         
-        for (int i = 0, j = 0; i < string.length(); i++) {
+        for (int i = 0, j = 0, k = 0; i < string.length(); i++) {
             char character = string.charAt(i);
             if (character == c){
-                indexes[j] = i;
-            } else if (character == ' ') j++;
+                indexes[j++] = k / 2;
+            } else if (character == ' ') k++;
         }
         return indexes;
     }
@@ -302,7 +327,7 @@ public class FracCalc {
         String[] inputTerms = input.split(" ");
         
         // The terms must be in the format {operand operator operand} (odd number of terms)
-        if (inputTerms.length % 2 == 0 || inputTerms.length < 3) return false;
+        if (inputTerms.length % 2 == 0 || input.length() < 5) return false;
         
         // loop over terms
         for (int termNumber = 0; termNumber < inputTerms.length; termNumber++) {
@@ -311,6 +336,7 @@ public class FracCalc {
             if (termNumber % 2 == 0){ // OPERAND TERMS
                 // remove parentheses and negative sign
                 term = stripParentheses(term);
+                if (term.length() == 0) return false;
                 if (term.charAt(0) == '-') term = term.substring(1);
                 
                 String[] wholePart = term.split("_");
