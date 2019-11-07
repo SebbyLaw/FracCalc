@@ -19,7 +19,6 @@ public class FracCalc {
         scanner.close();
     }
     
-    // DO NOT EDIT THIS HEADER!!! All unit tests run off this method
     public static String produceAnswer(String input) {
         if (!isValidOperation(input)) return "ERROR: Invalid input";
     
@@ -303,60 +302,34 @@ public class FracCalc {
     
     // Checks if the string input is a valid FracCalc operation
     private static boolean isValidOperation(String input) {
-        // make sure the number of opening and closing parenthesis are equal
-        if (!areParenthesesValid(input)) return false;
-        
         String[] inputTerms = input.split(" ");
-        
         // The terms must be in the format {operand operator operand} (odd number of terms)
         if (inputTerms.length % 2 == 0 || input.length() < 5) return false;
+        // make sure the number of opening and closing parenthesis are equal
+        if (!areParenthesesValid(input)) return false;
         
         // loop over terms
         for (int termNumber = 0; termNumber < inputTerms.length; termNumber++) {
             String term = inputTerms[termNumber];
-            
             if (termNumber % 2 == 0){ // OPERAND TERMS
-                // remove parentheses and negative sign
-                term = stripParentheses(term);
-                if (term.length() == 0) return false;
-                if (term.charAt(0) == '-') term = term.substring(1);
-                
-                String[] wholePart = term.split("_");
-                String[] fractionPart = wholePart[wholePart.length - 1].split("/");
-                
-                if (term.indexOf('_') == -1) { // if not mixed number
-                    if (fractionPart.length == 2){ // if fraction only
-                        for (String num : fractionPart) if (notInteger(num)) return false;
-                    } else if (notInteger(term)) return false;
-                } else { // if mixed number
-                    // whole number is integers
-                    if (notInteger(term.substring(0, term.indexOf('_')))) return false;
-                    // fraction parts are integers
-                    if (fractionPart.length == 2) { // if fraction only
-                        for (String num : fractionPart) if (notInteger(num)) return false;
-                    } else return false; // fraction must be length of 2
-                }
-                
+                if (!isValidOperand(term)) return false;
             } else { // OPERATOR TERMS
-                if (term.length() > 1) return false;
-                char[] validOperators = {'*', '/', '+', '-'};
-                if (!charInArray(term.charAt(0), validOperators)) return false;
+                if (!isValidOperator(term)) return false;
             }
         }
-        
-        // check if division by zero
+        // this line is reached only if all the terms are in a valid format
+        // the following lines check for division by zero
         int[][] operands = extractOperands(input);
         char[] operators = extractOperators(input);
-        for (int[] operand : operands){
-            if (operand[1] == 0) return false;
-        }
-        for (int i = 0; i < operators.length; i++){
+        for (int[] operand : operands) if (operand[1] == 0) return false;
+        for (int i = 0; i < operators.length; i++) {
             if (operators[i] == '/' && operands[i + 1][0] == 0) return false;
         }
         
         return true; // if nothing raised an error, return true
     }
     
+    // Separated parentheses error handling for isValidOperation
     private static boolean areParenthesesValid(String expression){
         boolean termHasParen = false;
         int open = 0;
@@ -379,5 +352,39 @@ public class FracCalc {
             }
         }
         return open == 0;
+    }
+    
+    // Separated parentheses error handling for isValidOperation
+    private static boolean isValidOperand(String operand){
+        // remove parentheses and negative sign
+        operand = stripParentheses(operand);
+        if (operand.length() == 0) return false;
+        if (operand.charAt(0) == '-') operand = operand.substring(1);
+    
+        String[] wholePart = operand.split("_");
+        String[] fractionPart = wholePart[wholePart.length - 1].split("/");
+    
+        if (operand.indexOf('_') == -1) { // if not mixed number
+            if (fractionPart.length == 2){ // if fraction only
+                for (String num : fractionPart) if (notInteger(num)) return false;
+            } else { // the term must be a whole number
+                return !notInteger(operand);
+            }
+        } else { // if mixed number
+            // whole number is integers
+            if (notInteger(operand.substring(0, operand.indexOf('_')))) return false;
+            // fraction parts are integers
+            if (fractionPart.length == 2) { // if fraction only
+                for (String num : fractionPart) if (notInteger(num)) return false;
+            } else return false; // fraction must be length of 2
+        }
+        return true;
+    }
+    
+    // Separated parentheses error handling for isValidOperation
+    private static boolean isValidOperator(String term){
+        if (term.length() > 1) return false;
+        char[] validOperators = {'*', '/', '+', '-'};
+        return charInArray(term.charAt(0), validOperators);
     }
 }
