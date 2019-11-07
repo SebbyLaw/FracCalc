@@ -1,3 +1,8 @@
+/*
+Sebastian Law
+2019.11.6
+ */
+
 package fracCalc;
 
 import java.util.Scanner;
@@ -26,7 +31,7 @@ public class FracCalc {
             input = doParentheses(input);
         }
         
-        return (evaluate(input));
+        return (evaluateExpression(input));
     }
     
     private static String doParentheses(String expression){
@@ -46,7 +51,7 @@ public class FracCalc {
             i++;
         }
         
-        String nested = evaluate(expression.substring(openingIndex, closingIndex));
+        String nested = evaluateExpression(expression.substring(openingIndex, closingIndex));
         return expression.substring(0, openingIndex) + nested + expression.substring(closingIndex + 1);
     }
     
@@ -55,7 +60,7 @@ public class FracCalc {
      * @param expression the expression to be evaluated
      * @return the fraction in mixed number string form
      */
-    private static String evaluate(String expression) {
+    private static String evaluateExpression(String expression) {
         char[][] priorityLevels = {{'*', '/'}, {'+', '-'}};
         int[][] operands = extractOperands(expression);
         char[] operators = extractOperators(expression);
@@ -82,19 +87,19 @@ public class FracCalc {
     private static int[][] doOperation(int[][] operands, char[] operators, int index){
         char op = operators[index];
         if (op == '*'){
-            operands[index] = multiplication(operands[index], operands[index + 1]);
+            operands[index] = doMultiplication(operands[index], operands[index + 1]);
         } else if (op == '/'){
-            operands[index] = division(operands[index], operands[index + 1]);
+            operands[index] = doDivision(operands[index], operands[index + 1]);
         } else if (op == '+'){
-            operands[index] = addition(operands[index], operands[index + 1]);
+            operands[index] = doAddition(operands[index], operands[index + 1]);
         } else { // subtraction
-            operands[index] = subtraction(operands[index], operands[index + 1]);
+            operands[index] = doSubtraction(operands[index], operands[index + 1]);
         }
         return removedIndex(operands, index + 1);
     }
     
     // multiplies one number with another in the form of fraction arrays
-    private static int[] multiplication(int[] firstFactor, int[] secondFactor){
+    private static int[] doMultiplication(int[] firstFactor, int[] secondFactor){
         int[] product = new int[2];
         
         product[0] = firstFactor[0] * secondFactor[0];
@@ -104,7 +109,7 @@ public class FracCalc {
     }
     
     // divides one number with another in the form of fraction arrays
-    private static int[] division(int[] dividend, int[] divisor){
+    private static int[] doDivision(int[] dividend, int[] divisor){
         int[] quotient = new int[2];
         
         quotient[0] = dividend[0] * divisor[1];
@@ -114,7 +119,7 @@ public class FracCalc {
     }
     
     // adds two numbers in the form of fraction arrays
-    private static int[] addition(int[] firstAddend, int[] secondAddend){
+    private static int[] doAddition(int[] firstAddend, int[] secondAddend){
         int[] sum = new int[2];
         
         int firstNumerator = firstAddend[0] * secondAddend[1];
@@ -127,10 +132,10 @@ public class FracCalc {
     }
     
     // subtracts one number from another in the form of fraction arrays
-    private static int[] subtraction(int[] minuend, int[] subtrahend){
+    private static int[] doSubtraction(int[] minuend, int[] subtrahend){
         subtrahend[0] *= -1;
         // addition but negative
-        return addition(minuend, subtrahend);
+        return doAddition(minuend, subtrahend);
     }
     
     // returns the operands of a string expression
@@ -245,7 +250,7 @@ public class FracCalc {
         return string;
     }
     
-    // cuts off parentheses from a string
+    // strips off parentheses from a string
     private static String stripParentheses(String string) {
         string = cutOffFront(string, new char[]{'('});
         if (string.length() > 0) {
@@ -275,11 +280,11 @@ public class FracCalc {
     }
     
     // Checks if a string is only integers
-    private static boolean notInteger(String string){
-        if (string.length() == 0) return true; // cannot start as an empty string
+    private static boolean isOnlyIntegers(String string){
+        if (string.length() == 0) return false; // cannot start as an empty string
         char[] integers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         string = cutOffFront(string, integers);
-        return string.length() != 0;
+        return string.length() == 0;
     }
     
     // Checks if the string input is a valid FracCalc operation
@@ -348,16 +353,16 @@ public class FracCalc {
     
         if (operand.indexOf('_') == -1) { // if not mixed number
             if (fractionPart.length == 2){ // if fraction only
-                for (String num : fractionPart) if (notInteger(num)) return false;
+                for (String num : fractionPart) if (!isOnlyIntegers(num)) return false;
             } else { // the term must be a whole number
-                return !notInteger(operand);
+                return isOnlyIntegers(operand);
             }
         } else { // if mixed number
             // whole number is integers
-            if (notInteger(operand.substring(0, operand.indexOf('_')))) return false;
+            if (!isOnlyIntegers(operand.substring(0, operand.indexOf('_')))) return false;
             // fraction parts are integers
             if (fractionPart.length == 2) { // if fraction only
-                for (String num : fractionPart) if (notInteger(num)) return false;
+                for (String num : fractionPart) if (!isOnlyIntegers(num)) return false;
             } else return false; // fraction must be length of 2
         }
         return true;
