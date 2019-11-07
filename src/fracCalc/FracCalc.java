@@ -354,7 +354,7 @@ public class FracCalc {
         return open == 0;
     }
     
-    // Separated parentheses error handling for isValidOperation
+    // Separated operand error handling for isValidOperation
     private static boolean isValidOperand(String operand){
         // remove parentheses and negative sign
         operand = stripParentheses(operand);
@@ -381,7 +381,7 @@ public class FracCalc {
         return true;
     }
     
-    // Separated parentheses error handling for isValidOperation
+    // Separated operator error handling for isValidOperation
     private static boolean isValidOperator(String term){
         if (term.length() > 1) return false;
         char[] validOperators = {'*', '/', '+', '-'};
