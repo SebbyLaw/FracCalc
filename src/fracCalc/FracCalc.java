@@ -256,15 +256,6 @@ public class FracCalc {
         return string;
     }
     
-    // counts the number of a char in the string
-    private static int countCharIn(String string, char c){
-        int count = 0;
-        for (int i = 0; i < string.length(); i++) {
-            if (string.charAt(i) == c) count++;
-        }
-        return count;
-    }
-    
     // removes an index from a operand array
     private static int[][] removedIndex(int[][] fractionArray, int index) {
         int[][] shifted = new int[fractionArray.length - 1][2];
