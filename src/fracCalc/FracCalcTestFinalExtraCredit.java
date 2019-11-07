@@ -2,6 +2,7 @@ package fracCalc;
 
 /*
 Unit tests for FracCalc extra credit
+by Sebastian Law
  */
 
 import org.junit.After;

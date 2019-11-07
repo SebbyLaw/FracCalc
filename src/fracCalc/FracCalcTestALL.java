@@ -14,8 +14,6 @@ import org.junit.runners.Suite;
     FracCalcTestCheckpoint2.class,
     FracCalcTestCheckpoint3.class,
     FracCalcTestFinal.class,
-    
-    // Extra Credit written by Sebastian Law
     FracCalcTestFinalExtraCredit.class,
 })
 
