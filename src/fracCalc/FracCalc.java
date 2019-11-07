@@ -266,24 +266,6 @@ public class FracCalc {
         return count;
     }
     
-    /**
-     * Returns the indexes of a character in relation to the operands array
-     * Does not work with spaces
-     * @param string the string to search
-     * @param c the character the string is searched for
-     */
-    private static int[] indexesOf(String string, char c){
-        int[] indexes = new int[countCharIn(string, c)];
-        
-        for (int i = 0, j = 0, k = 0; i < string.length(); i++) {
-            char character = string.charAt(i);
-            if (character == c){
-                indexes[j++] = k / 2;
-            } else if (character == ' ') k++;
-        }
-        return indexes;
-    }
-    
     // removes an index from a operand array
     private static int[][] removedIndex(int[][] fractionArray, int index) {
         int[][] shifted = new int[fractionArray.length - 1][2];
@@ -322,7 +304,7 @@ public class FracCalc {
     // Checks if the string input is a valid FracCalc operation
     private static boolean isValidOperation(String input) {
         // make sure the number of opening and closing parenthesis are equal
-        if (countCharIn(input, '(') != countCharIn(input, ')')) return false;
+        if (!areParenthesesValid(input)) return false;
         
         String[] inputTerms = input.split(" ");
         
@@ -373,5 +355,29 @@ public class FracCalc {
         }
         
         return true; // if nothing raised an error, return true
+    }
+    
+    private static boolean areParenthesesValid(String expression){
+        boolean termHasParen = false;
+        int open = 0;
+        
+        for (char character : expression.toCharArray()){
+            if (character == ' ') termHasParen = false;
+            // reset term
+            
+            if (character == '(') {
+                termHasParen = true;
+                open++; // increment the number of unclosed pairs
+            }
+            
+            if (character == ')'){
+                if (termHasParen) return false;
+                // parentheses cannot be around a single term
+                if (open > 0) {
+                    open--; // decrement the number of unclosed pairs
+                } else return false;
+            }
+        }
+        return open == 0;
     }
 }
