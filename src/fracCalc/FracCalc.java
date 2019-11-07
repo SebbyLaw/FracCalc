@@ -78,7 +78,6 @@ public class FracCalc {
     
     /**
      * Does one operation. You must manually decrement the operators array
-     * (using Objects would solve this!)
      * @param operands the operands array
      * @param operators the operators array
      * @param index the index of the operator array to evaluate
