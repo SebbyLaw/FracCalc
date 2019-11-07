@@ -130,27 +130,15 @@ public class FracCalc {
         return false;
     }
     
-    // cuts off the front of the string if it contains a cutoff character
-    private static String cutOffFront(String string, char[] cutoffs){
-        boolean keepGoing = true;
-        while (keepGoing){
-            if (string.length() > 0 && charInArray(string.charAt(0), cutoffs)) {
-                string = string.substring(1);
-            } else {
-                keepGoing = false;
-            }
-        }
-        return string;
-    }
-    
     // strips off parentheses from a string
     static String stripParentheses(String string) {
-        string = cutOffFront(string, new char[]{'('});
-        if (string.length() > 0) {
-            while (string.charAt(string.length() - 1) == ')') {
-                string = string.substring(0, string.length() - 1);
-            }
+        while (string.length() > 0 && string.charAt(0) == '('){
+            string = string.substring(1);
         }
+        while (string.length() > 0 && string.charAt(string.length() - 1) == ')') {
+            string = string.substring(0, string.length() - 1);
+        }
+        
         return string;
     }
     
@@ -230,8 +218,10 @@ public class FracCalc {
     private static boolean isOnlyIntegers(String string){
         if (string.length() == 0) return false; // cannot start as an empty string
         char[] integers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        string = cutOffFront(string, integers);
-        return string.length() == 0;
+        for (char c : string.toCharArray()){
+            if (!charInArray(c, integers)) return false;
+        }
+        return true;
     }
     
     // Separated operand error handling for isValidOperation
@@ -244,7 +234,7 @@ public class FracCalc {
         String[] wholePart = operand.split("_");
         String[] fractionPart = wholePart[wholePart.length - 1].split("/");
     
-        if (operand.indexOf('_') == -1) { // if not mixed number
+        if (!operand.contains("_")) { // if not mixed number
             if (fractionPart.length == 2){ // if fraction only
                 for (String num : fractionPart) if (!isOnlyIntegers(num)) return false;
             } else { // the term must be a whole number
