@@ -28,13 +28,13 @@ public class FracCalc {
         if (!isValidOperation(input)) return "ERROR: Invalid input";
     
         while (input.contains(")")) { // while parentheses exist
-            input = doParentheses(input);
+            input = doParenthesis(input);
         }
         
         return (evaluateExpression(input));
     }
     
-    private static String doParentheses(String expression){
+    private static String doParenthesis(String expression){
         boolean indexesFound = false;
         int openingIndex = 0;
         int closingIndex = expression.length();
@@ -86,14 +86,15 @@ public class FracCalc {
      */
     private static int[][] doOperation(int[][] operands, char[] operators, int index){
         char op = operators[index];
+        int[] secondOperand = operands[index + 1];
         if (op == '*'){
-            operands[index] = doMultiplication(operands[index], operands[index + 1]);
+            operands[index] = doMultiplication(operands[index], secondOperand);
         } else if (op == '/'){
-            operands[index] = doDivision(operands[index], operands[index + 1]);
+            operands[index] = doDivision(operands[index], secondOperand);
         } else if (op == '+'){
-            operands[index] = doAddition(operands[index], operands[index + 1]);
+            operands[index] = doAddition(operands[index], secondOperand);
         } else { // subtraction
-            operands[index] = doSubtraction(operands[index], operands[index + 1]);
+            operands[index] = doSubtraction(operands[index], secondOperand);
         }
         return removedIndex(operands, index + 1);
     }
@@ -163,6 +164,33 @@ public class FracCalc {
     }
     
     /**
+     * Converts the MixedNumber string format to an integer fraction array.
+     * @param formatted the formatted mixed number string
+     * @return An integer array with length of 2. Represents a fraction as [numerator, denominator]
+     */
+    private static int[] toFractionForm(String formatted){
+        int[] fraction = new int[2];
+        
+        formatted = stripParentheses(formatted);
+        
+        boolean isNegative = formatted.indexOf('-') == 0;
+        if (isNegative) formatted = formatted.substring(1);
+        
+        String[] wholePart = formatted.split("_");
+        String[] fractionPart = wholePart[wholePart.length - 1].split("/");
+        
+        // denominator is denominator (1 if whole number only)
+        fraction[1] = fractionPart.length == 2 ? Integer.parseInt(fractionPart[1]) : 1;
+        // numerator is numerator (same if only whole number)
+        fraction[0] = Integer.parseInt(fractionPart[0]);
+        // Add the whole to the numerator if it's a mixed number
+        if (wholePart.length == 2) fraction[0] += Integer.parseInt(wholePart[0]) * fraction[1];
+        
+        if (isNegative) fraction[0] *= -1;
+        return fraction;
+    }
+    
+    /**
      * Converts the fraction array into an acceptable String format
      * @param fraction the array representing the fraction
      * @return the FracCalc output form String
@@ -187,34 +215,6 @@ public class FracCalc {
         return stringFormat;
     }
     
-    /**
-     * Converts the MixedNumber string format to an integer fraction array.
-     * @param formatted the formatted mixed number string
-     * @return An integer array with length of 2. Represents a fraction as [numerator, denominator]
-     */
-    private static int[] toFractionForm(String formatted){
-        int[] fraction = new int[2];
-        
-        formatted = stripParentheses(formatted);
-        
-        boolean isNegative = formatted.indexOf('-') == 0;
-        if (isNegative) formatted = formatted.substring(1);
-        
-        String[] wholePart = formatted.split("_");
-        String[] fractionPart = wholePart[wholePart.length - 1].split("/");
-        
-        // denominator is denominator (1 if whole number only)
-        fraction[1] = fractionPart.length == 2 ? Integer.parseInt(fractionPart[1]) : 1;
-        // numerator is numerator (same if only whole number)
-        fraction[0] = Integer.parseInt(fractionPart[0]);
-        // Add the whole to the numerator if it's a mixed number
-        if (wholePart.length == 2) fraction[0] += Integer.parseInt(wholePart[0]) * fraction[1];
-        
-        if (isNegative) fraction[0] *= -1;
-        simplifyFraction(fraction);
-        return fraction;
-    }
-    
     // returns a simplified a fraction array
     private static void simplifyFraction(int[] fraction){
         if (fraction[0] < 0 && fraction[1] < 0){
@@ -237,27 +237,15 @@ public class FracCalc {
         return false;
     }
     
-    // cuts off the front of the string if it contains a cutoff character
-    private static String cutOffFront(String string, char[] cutoffs){
-        boolean keepGoing = true;
-        while (keepGoing){
-            if (string.length() > 0 && charInArray(string.charAt(0), cutoffs)) {
-                string = string.substring(1);
-            } else {
-                keepGoing = false;
-            }
-        }
-        return string;
-    }
-    
     // strips off parentheses from a string
     private static String stripParentheses(String string) {
-        string = cutOffFront(string, new char[]{'('});
-        if (string.length() > 0) {
-            while (string.charAt(string.length() - 1) == ')') {
-                string = string.substring(0, string.length() - 1);
-            }
+        while (string.length() > 0 && string.charAt(0) == '('){
+            string = string.substring(1);
         }
+        while (string.length() > 0 && string.charAt(string.length() - 1) == ')') {
+            string = string.substring(0, string.length() - 1);
+        }
+        
         return string;
     }
     
@@ -283,8 +271,10 @@ public class FracCalc {
     private static boolean isOnlyIntegers(String string){
         if (string.length() == 0) return false; // cannot start as an empty string
         char[] integers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-        string = cutOffFront(string, integers);
-        return string.length() == 0;
+        for (char c : string.toCharArray()){
+            if (!charInArray(c, integers)) return false;
+        }
+        return true;
     }
     
     // Checks if the string input is a valid FracCalc operation
@@ -351,7 +341,7 @@ public class FracCalc {
         String[] wholePart = operand.split("_");
         String[] fractionPart = wholePart[wholePart.length - 1].split("/");
     
-        if (operand.indexOf('_') == -1) { // if not mixed number
+        if (!operand.contains("_")) { // if not mixed number
             if (fractionPart.length == 2){ // if fraction only
                 for (String num : fractionPart) if (!isOnlyIntegers(num)) return false;
             } else { // the term must be a whole number
