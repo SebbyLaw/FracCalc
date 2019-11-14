@@ -23,7 +23,6 @@ public class MixedNumber {
         if (wholePart.length == 2) this.numerator += Integer.parseInt(wholePart[0]) * this.denominator;
     
         if (isNegative) this.numerator *= -1;
-        this.simplify();
     }
     
     private MixedNumber(int numerator, int denominator){
@@ -34,13 +33,11 @@ public class MixedNumber {
     public void multiplyBy(MixedNumber factor){
         this.numerator *= factor.numerator;
         this.denominator *= factor.denominator;
-        this.simplify();
     }
     
     public void divideBy(MixedNumber divisor){
         this.numerator *= divisor.denominator;
         this.denominator *= divisor.numerator;
-        this.simplify();
     }
     
     public void addedBy(MixedNumber addend){
@@ -49,26 +46,11 @@ public class MixedNumber {
     
         this.numerator = firstNumerator + secondNumerator;
         this.denominator *= addend.denominator;
-    
-        this.simplify();
     }
     
     public void subtractedBy(MixedNumber subtrahend){
         MixedNumber NegativeSub = new MixedNumber(subtrahend.numerator * -1, subtrahend.denominator);
         this.addedBy(NegativeSub);
-    }
-    
-    private void simplify(){
-        if (numerator < 0 && denominator < 0){
-            numerator = Math.abs(numerator);
-            denominator = Math.abs(denominator);
-        }
-        for (int i = Math.max(numerator, denominator); i > 1; i--) {
-            while (numerator % i == 0 && denominator % i == 0) {
-                numerator /= i;
-                denominator /= i;
-            }
-        }
     }
     
     public int getNumerator() {
@@ -80,13 +62,16 @@ public class MixedNumber {
     }
     
     public String toString() {
-        this.simplify();
-        String stringFormat = (numerator * denominator < 0) ? "-" : "";
+        // simplify fraction
+        int gcf = getGCF(numerator, denominator);
+        numerator /= gcf;
+        denominator /= gcf;
         
+        // negative sign if negative fraction, else empty string
+        String stringFormat = (numerator * denominator < 0) ? "-" : "";
         numerator = Math.abs(numerator);
         denominator = Math.abs(denominator);
     
-        // negative sign if negative fraction, else empty string
         if (numerator % denominator == 0) { // if whole number ONLY
             stringFormat += numerator / denominator;
         } else {
@@ -98,5 +83,10 @@ public class MixedNumber {
         }
     
         return stringFormat;
+    }
+    
+    // gets the greatest common factor of two numbers
+    private static int getGCF(int a, int b){
+        return (b == 0) ? a : getGCF(b, a % b);
     }
 }
