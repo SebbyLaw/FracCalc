@@ -195,12 +195,16 @@ public class FracCalc {
      * @return the FracCalc output form String
      */
     private static String toMixedNumberForm(int[] fraction){
-        simplifyFraction(fraction);
+        // simplify
+        int gcf = getGCF(fraction[0], fraction[1]);
+        fraction[0] /= gcf;
+        fraction[1] /= gcf;
+    
+        // negative sign if negative fraction, else empty string
+        String stringFormat = (fraction[0] * fraction[1] < 0) ? "-" : "";
         int numerator = Math.abs(fraction[0]);
         int denominator = Math.abs(fraction[1]);
         
-        String stringFormat = (fraction[0] * fraction[1] < 0) ? "-" : "";
-        // negative sign if negative fraction, else empty string
         if (numerator % denominator == 0) { // if whole number ONLY
             stringFormat += numerator / denominator;
         } else {
@@ -214,18 +218,9 @@ public class FracCalc {
         return stringFormat;
     }
     
-    // returns a simplified a fraction array
-    private static void simplifyFraction(int[] fraction){
-        if (fraction[0] < 0 && fraction[1] < 0){
-            fraction[0] = Math.abs(fraction[0]);
-            fraction[1] = Math.abs(fraction[1]);
-        }
-        for (int i = Math.max(fraction[0], fraction[1]); i > 1; i--) {
-            if (fraction[0] % i == 0 && fraction[1] % i == 0) {
-                fraction[0] /= i;
-                fraction[1] /= i;
-            }
-        }
+    // gets the greatest common factor of two numbers
+    private static int getGCF(int a, int b){
+        return (b == 0) ? a : getGCF(b, a % b);
     }
     
     // if a string contains ANY character in a character array
