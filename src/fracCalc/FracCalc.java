@@ -1,6 +1,6 @@
 /*
 Sebastian Law
-2019.11.6
+2019.11.17
  */
 
 package fracCalc;
@@ -24,6 +24,11 @@ public class FracCalc {
         scanner.close();
     }
     
+    /**
+     * Produces an answer based on an expression input
+     * @param input the expression
+     * @return the evaluation of the expression
+     */
     public static String produceAnswer(String input) {
         if (!isValidOperation(input)) return "ERROR: Invalid input";
     
@@ -34,6 +39,11 @@ public class FracCalc {
         return (evaluateExpression(input));
     }
     
+    /**
+     * Evaluates all the parentheses in an expression
+     * @param expression the expression to evaluate
+     * @return the evaluated expression (may not be fully evaluated)
+     */
     private static String doParentheses(String expression){
         boolean indexesFound = false;
         int openingIndex = 0;
@@ -98,7 +108,11 @@ public class FracCalc {
         return removedIndex(operands, index + 1);
     }
     
-    // returns the operands of a string expression
+    /**
+     * returns the operands of a string expression
+     * @param expression the expression string
+     * @return an array of MixedNumbers within the expression representing operands
+     */
     private static MixedNumber[] extractOperands(String expression){
         String[] expressionTerms = expression.split(" ");
         MixedNumber[] operands = new MixedNumber[expressionTerms.length / 2 + 1];
@@ -110,7 +124,11 @@ public class FracCalc {
         return operands;
     }
     
-    // returns the operators of a string expression
+    /**
+     * returns the operators of a string expression
+     * @param expression the expression string
+     * @return an array of chars within the expression representing operators
+     */
     private static char[] extractOperators(String expression){
         String[] expressionTerms = expression.split(" ");
         char[] operators = new char[expressionTerms.length / 2];
@@ -122,7 +140,12 @@ public class FracCalc {
         return operators;
     }
     
-    // if a string contains ANY character in a character array
+    /**
+     * Searches a character array and returns true if a character is found in it
+     * @param c the character to parse
+     * @param characters the character array to search
+     * @return True if c is found in the array characters
+     */
     private static boolean charInArray(char c, char[] characters){
         for (char character : characters){
             if (character == c) return true;
@@ -130,7 +153,11 @@ public class FracCalc {
         return false;
     }
     
-    // strips off parentheses from a string
+    /**
+     * Strips the parentheses from the front and back of a string
+     * @param string the string to strip
+     * @return the stripped string
+     */
     static String stripParentheses(String string) {
         while (string.length() > 0 && string.charAt(0) == '('){
             string = string.substring(1);
@@ -142,7 +169,12 @@ public class FracCalc {
         return string;
     }
     
-    // removes an index from a operand array
+    /**
+     * removes an index from an operand array
+     * @param fractionArray the operand array to edit
+     * @param index the index to remove
+     * @return a new array without the index
+     */
     private static MixedNumber[] removedIndex(MixedNumber[] fractionArray, int index) {
         MixedNumber[] shifted = new MixedNumber[fractionArray.length - 1];
         for (int i = 0, j = 0; i < fractionArray.length; i++) {
@@ -151,7 +183,12 @@ public class FracCalc {
         return shifted;
     }
     
-    // removes an index from a operator array
+    /**
+     * removes an index from an operator array
+     * @param operatorArray the operator array to edit
+     * @param index the index to remove
+     * @return a new array without the index
+     */
     private static char[] removedIndex(char[] operatorArray, int index){
         char[] shifted = new char[operatorArray.length - 1];
         for (int i = 0, j = 0; i < operatorArray.length; i++) {
@@ -160,7 +197,11 @@ public class FracCalc {
         return shifted;
     }
     
-    // Checks if the string input is a valid FracCalc operation
+    /**
+     * Checks whether a string expression is in valid FracCalc format
+     * @param input the expression to parse
+     * @return True if the expression is in a valid format
+     */
     private static boolean isValidOperation(String input) {
         String[] inputTerms = input.split(" ");
         // The terms must be in the format {operand operator operand} (odd number of terms)
@@ -189,7 +230,11 @@ public class FracCalc {
         return true; // if nothing raised an error, return true
     }
     
-    // Separated parentheses error handling for isValidOperation
+    /**
+     * Checks whether a string expression has valid parentheses format
+     * @param expression the expression to parse
+     * @return True if the parentheses are in a valid format
+     */
     private static boolean areParenthesesValid(String expression){
         boolean termHasParen = false;
         int open = 0;
@@ -214,7 +259,11 @@ public class FracCalc {
         return open == 0;
     }
     
-    // Checks if a string is only integers
+    /**
+     * Checks if a string is entirely made up of integers
+     * @param string the string to parse
+     * @return True if the string only contains integers
+     */
     private static boolean isOnlyIntegers(String string){
         if (string.length() == 0) return false; // cannot start as an empty string
         char[] integers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -224,7 +273,11 @@ public class FracCalc {
         return true;
     }
     
-    // Separated operand error handling for isValidOperation
+    /**
+     * Checks if an operand string is in a valid format
+     * @param operand the operand string to parse
+     * @return True if the operand is in a valid format
+     */
     private static boolean isValidOperand(String operand){
         // remove parentheses and negative sign
         operand = stripParentheses(operand);
@@ -251,7 +304,11 @@ public class FracCalc {
         return true;
     }
     
-    // Separated operator error handling for isValidOperation
+    /**
+     * Checks if an operator string is in a valid format
+     * @param operator the operator string to parse
+     * @return True if the operator is in a valid format
+     */
     private static boolean isValidOperator(String operator){
         if (operator.length() > 1) return false;
         char[] validOperators = {'*', '/', '+', '-'};

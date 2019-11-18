@@ -1,3 +1,8 @@
+/*
+Sebastian Law
+2019.11.17
+ */
+
 package fracCalc;
 
 public class MixedNumber {
@@ -5,7 +10,10 @@ public class MixedNumber {
     private int numerator;
     private int denominator;
     
-    // Takes in a string in the correct format
+    /**
+     * Takes in a string in the correct format
+     * @param formatted the formatted FracCalc string
+     */
     public MixedNumber(String formatted){
         formatted = FracCalc.stripParentheses(formatted);
     
@@ -25,21 +33,38 @@ public class MixedNumber {
         if (isNegative) this.numerator *= -1;
     }
     
-    private MixedNumber(int numerator, int denominator){
+    /**
+     * Creates a MixedNumber in the numerator/denominator format
+     * @param numerator the numerator
+     * @param denominator the denominator
+     */
+    public MixedNumber(int numerator, int denominator){
         this.numerator = numerator;
         this.denominator = denominator;
     }
     
+    /**
+     * Directly multiplies (similar to *=) a MixedNumber by another
+     * @param factor the MixedNumber to multiply by
+     */
     public void multiplyBy(MixedNumber factor){
         this.numerator *= factor.numerator;
         this.denominator *= factor.denominator;
     }
     
+    /**
+     * Directly divides (similar to /=) a MixedNumber by another
+     * @param divisor the MixedNumber to divide by
+     */
     public void divideBy(MixedNumber divisor){
         this.numerator *= divisor.denominator;
         this.denominator *= divisor.numerator;
     }
     
+    /**
+     * Directly adds (similar to +=) a MixedNumber to another
+     * @param addend the MixedNumber to add
+     */
     public void addedBy(MixedNumber addend){
         int firstNumerator = this.numerator * addend.denominator;
         int secondNumerator = addend.numerator * this.denominator;
@@ -48,19 +73,32 @@ public class MixedNumber {
         this.denominator *= addend.denominator;
     }
     
+    /**
+     * Directly subtracts (similar to *=) a MixedNumber by another
+     * @param subtrahend the MixedNumber to subtract by
+     */
     public void subtractedBy(MixedNumber subtrahend){
         MixedNumber NegativeSub = new MixedNumber(subtrahend.numerator * -1, subtrahend.denominator);
         this.addedBy(NegativeSub);
     }
     
+    /**
+     * @return the MixedNumber numerator
+     */
     public int getNumerator() {
         return numerator;
     }
     
+    /**
+     * @return the MixedNumber denominator
+     */
     public int getDenominator() {
         return denominator;
     }
     
+    /**
+     * @return the simplified string format of the MixedNumber
+     */
     public String toString() {
         // simplify fraction
         int gcf = getGCF(numerator, denominator);
@@ -85,7 +123,12 @@ public class MixedNumber {
         return stringFormat;
     }
     
-    // gets the greatest common factor of two numbers
+    /**
+     * Gets the greatest common denominator of two numbers
+     * @param a first number
+     * @param b second number
+     * @return the greatest common denominator
+     */
     private static int getGCF(int a, int b){
         return (b == 0) ? a : getGCF(b, a % b);
     }
