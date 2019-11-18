@@ -1,11 +1,11 @@
 /*
 Sebastian Law
-2019.11.17
+2019.11.18
  */
 
 package fracCalc;
 
-public class MixedNumber {
+public class Fraction {
     
     private int numerator;
     private int denominator;
@@ -14,7 +14,7 @@ public class MixedNumber {
      * Takes in a string in the correct format
      * @param formatted the formatted FracCalc string
      */
-    public MixedNumber(String formatted){
+    public Fraction(String formatted){
         formatted = FracCalc.stripParentheses(formatted);
     
         boolean isNegative = formatted.indexOf('-') == 0;
@@ -34,38 +34,38 @@ public class MixedNumber {
     }
     
     /**
-     * Creates a MixedNumber in the numerator/denominator format
+     * Creates a Fraction in the numerator/denominator format
      * @param numerator the numerator
      * @param denominator the denominator
      */
-    public MixedNumber(int numerator, int denominator){
+    public Fraction(int numerator, int denominator){
         this.numerator = numerator;
         this.denominator = denominator;
     }
     
     /**
-     * Directly multiplies (similar to *=) a MixedNumber by another
-     * @param factor the MixedNumber to multiply by
+     * Directly multiplies (similar to *=) a Fraction by another
+     * @param factor the Fraction to multiply by
      */
-    public void multiplyBy(MixedNumber factor){
+    public void multiplyBy(Fraction factor){
         this.numerator *= factor.numerator;
         this.denominator *= factor.denominator;
     }
     
     /**
-     * Directly divides (similar to /=) a MixedNumber by another
-     * @param divisor the MixedNumber to divide by
+     * Directly divides (similar to /=) a Fraction by another
+     * @param divisor the Fraction to divide by
      */
-    public void divideBy(MixedNumber divisor){
+    public void divideBy(Fraction divisor){
         this.numerator *= divisor.denominator;
         this.denominator *= divisor.numerator;
     }
     
     /**
-     * Directly adds (similar to +=) a MixedNumber to another
-     * @param addend the MixedNumber to add
+     * Directly adds (similar to +=) a Fraction to another
+     * @param addend the Fraction to add
      */
-    public void addedBy(MixedNumber addend){
+    public void addedBy(Fraction addend){
         int firstNumerator = this.numerator * addend.denominator;
         int secondNumerator = addend.numerator * this.denominator;
     
@@ -74,30 +74,30 @@ public class MixedNumber {
     }
     
     /**
-     * Directly subtracts (similar to -=) a MixedNumber by another
-     * @param subtrahend the MixedNumber to subtract by
+     * Directly subtracts (similar to -=) a Fraction by another
+     * @param subtrahend the Fraction to subtract by
      */
-    public void subtractedBy(MixedNumber subtrahend){
+    public void subtractedBy(Fraction subtrahend){
         subtrahend.numerator *= -1;
         this.addedBy(subtrahend);
     }
     
     /**
-     * @return the MixedNumber numerator
+     * @return the Fraction numerator
      */
     public int getNumerator() {
         return numerator;
     }
     
     /**
-     * @return the MixedNumber denominator
+     * @return the Fraction denominator
      */
     public int getDenominator() {
         return denominator;
     }
     
     /**
-     * @return the simplified string format of the MixedNumber
+     * @return the simplified string format of the Fraction
      */
     public String toString() {
         // simplify fraction

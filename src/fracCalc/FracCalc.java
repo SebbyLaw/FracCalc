@@ -1,6 +1,6 @@
 /*
 Sebastian Law
-2019.11.17
+2019.11.18
  */
 
 package fracCalc;
@@ -74,7 +74,7 @@ public class FracCalc {
      */
     private static String evaluateExpression(String expression) {
         char[][] priorityLevels = {{'*', '/'}, {'+', '-'}};
-        ArrayList<MixedNumber> operands = extractOperands(expression);
+        ArrayList<Fraction> operands = extractOperands(expression);
         ArrayList<Character> operators = extractOperators(expression);
         // iterate over priority in order of operations
         for (char[] priority : priorityLevels) {
@@ -93,9 +93,9 @@ public class FracCalc {
      * @param operators the operators ArrayList
      * @param index the index of the operator ArrayList to evaluate
      */
-    private static void doOperation(ArrayList<MixedNumber> operands, ArrayList<Character> operators, int index){
+    private static void doOperation(ArrayList<Fraction> operands, ArrayList<Character> operators, int index){
         char op = operators.get(index);
-        MixedNumber secondNum = operands.get(index + 1);
+        Fraction secondNum = operands.get(index + 1);
         if (op == '*'){
             operands.get(index).multiplyBy(secondNum);
         } else if (op == '/'){
@@ -114,12 +114,12 @@ public class FracCalc {
      * @param expression the expression string
      * @return an ArrayList of MixedNumbers within the expression representing operands
      */
-    private static ArrayList<MixedNumber> extractOperands(String expression){
+    private static ArrayList<Fraction> extractOperands(String expression){
         String[] expressionTerms = expression.split(" ");
-        ArrayList<MixedNumber> operands = new ArrayList<>();
+        ArrayList<Fraction> operands = new ArrayList<>();
         for (int i = 0; i < expressionTerms.length; i++) {
             if (i % 2 == 0){
-                operands.add(new MixedNumber(expressionTerms[i]));
+                operands.add(new Fraction(expressionTerms[i]));
             }
         }
         return operands;
@@ -181,7 +181,7 @@ public class FracCalc {
         if (inputTerms.length % 2 == 0 || input.length() < 5) return "Error: Input is in an invalid format";
         // make sure the number of opening and closing parenthesis are equal
         if (!areParenthesesValid(input)) return "Error: Parentheses are in an invalid format";
-        ArrayList<MixedNumber> operands = new ArrayList<>();
+        ArrayList<Fraction> operands = new ArrayList<>();
         ArrayList<Character> operators = new ArrayList<>();
         
         // loop over terms
@@ -189,7 +189,7 @@ public class FracCalc {
             String term = inputTerms[termNumber];
             if (termNumber % 2 == 0){ // OPERAND TERMS
                 if (!isValidOperand(term)) return String.format("Error: Invalid Operand %s", term);
-                operands.add(new MixedNumber(term));
+                operands.add(new Fraction(term));
             } else { // OPERATOR TERMS
                 if (!isValidOperator(term)) return String.format("Error: Invalid Operator %s", term);
                 operators.add(term.charAt(0));
@@ -198,7 +198,7 @@ public class FracCalc {
         // this line is reached only if all the terms are in a valid format
         // the following lines check for division by zero
         for (int i = 0; i < operands.size(); i++) {
-            MixedNumber operand = operands.get(i);
+            Fraction operand = operands.get(i);
             if (operand.getDenominator() == 0) {
                 return String.format("Error: denominator is zero for operand %s", inputTerms[i * 2]);
             }
