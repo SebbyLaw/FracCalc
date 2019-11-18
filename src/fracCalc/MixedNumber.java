@@ -74,12 +74,12 @@ public class MixedNumber {
     }
     
     /**
-     * Directly subtracts (similar to *=) a MixedNumber by another
+     * Directly subtracts (similar to -=) a MixedNumber by another
      * @param subtrahend the MixedNumber to subtract by
      */
     public void subtractedBy(MixedNumber subtrahend){
-        MixedNumber NegativeSub = new MixedNumber(subtrahend.numerator * -1, subtrahend.denominator);
-        this.addedBy(NegativeSub);
+        subtrahend.numerator *= -1;
+        this.addedBy(subtrahend);
     }
     
     /**
