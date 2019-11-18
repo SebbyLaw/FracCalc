@@ -31,7 +31,8 @@ public class FracCalc {
      * @return the evaluation of the expression
      */
     public static String produceAnswer(String input) {
-        if (!isValidOperation(input)) return "ERROR: Invalid input";
+        String errorMessage = testValidOperation(input);
+        if (errorMessage.toLowerCase().contains("error")) return errorMessage;
     
         while (input.contains(")")) { // while parentheses exist
             input = doParentheses(input);
@@ -172,14 +173,14 @@ public class FracCalc {
     /**
      * Checks whether a string expression is in valid FracCalc format
      * @param input the expression to parse
-     * @return True if the expression is in a valid format
+     * @return The error if there is one, else an empty string
      */
-    private static boolean isValidOperation(String input) {
+    private static String testValidOperation(String input) {
         String[] inputTerms = input.split(" ");
         // The terms must be in the format {operand operator operand} (odd number of terms)
-        if (inputTerms.length % 2 == 0 || input.length() < 5) return false;
+        if (inputTerms.length % 2 == 0 || input.length() < 5) return "Error: Input is in an invalid format";
         // make sure the number of opening and closing parenthesis are equal
-        if (!areParenthesesValid(input)) return false;
+        if (!areParenthesesValid(input)) return "Error: Parentheses are in an invalid format";
         ArrayList<MixedNumber> operands = new ArrayList<>();
         ArrayList<Character> operators = new ArrayList<>();
         
@@ -187,21 +188,26 @@ public class FracCalc {
         for (int termNumber = 0; termNumber < inputTerms.length; termNumber++) {
             String term = inputTerms[termNumber];
             if (termNumber % 2 == 0){ // OPERAND TERMS
-                if (!isValidOperand(term)) return false;
+                if (!isValidOperand(term)) return String.format("Error: Invalid Operand %s", term);
                 operands.add(new MixedNumber(term));
             } else { // OPERATOR TERMS
-                if (!isValidOperator(term)) return false;
+                if (!isValidOperator(term)) return String.format("Error: Invalid Operator %s", term);
                 operators.add(term.charAt(0));
             }
         }
         // this line is reached only if all the terms are in a valid format
         // the following lines check for division by zero
-        for (MixedNumber operand : operands) if (operand.getDenominator() == 0) return false;
+        for (int i = 0; i < operands.size(); i++) {
+            MixedNumber operand = operands.get(i);
+            if (operand.getDenominator() == 0) {
+                return String.format("Error: denominator is zero for operand %s", inputTerms[i * 2]);
+            }
+        }
         for (int i = 0; i < operators.size(); i++) {
-            if (operators.get(i) == '/' && operands.get(i + 1).getNumerator() == 0) return false;
+            if (operators.get(i) == '/' && operands.get(i + 1).getNumerator() == 0) return "Error: division by zero";
         }
         
-        return true; // if nothing raised an error, return true
+        return ""; // if nothing raised an error, return empty string
     }
     
     /**
