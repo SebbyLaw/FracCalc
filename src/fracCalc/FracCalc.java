@@ -1,6 +1,6 @@
 /*
 Sebastian Law
-2019.11.6
+2019.11.17
  */
 
 package fracCalc;
@@ -25,7 +25,9 @@ public class FracCalc {
     }
     
     public static String produceAnswer(String input) {
-        if (!isValidOperation(input)) return "ERROR: Invalid input";
+        String errorMessage = testValidOperation(input);
+        if (errorMessage.toLowerCase().contains("error")) return errorMessage;
+    
     
         while (input.contains(")")) { // while parentheses exist
             input = doParenthesis(input);
@@ -272,32 +274,37 @@ public class FracCalc {
     }
     
     // Checks if the string input is a valid FracCalc operation
-    private static boolean isValidOperation(String input) {
+    private static String testValidOperation(String input) {
         String[] inputTerms = input.split(" ");
         // The terms must be in the format {operand operator operand} (odd number of terms)
-        if (inputTerms.length % 2 == 0 || input.length() < 5) return false;
+        if (inputTerms.length % 2 == 0 || input.length() < 5) return "Error: Input is in an invalid format";
         // make sure the number of opening and closing parenthesis are equal
-        if (!areParenthesesValid(input)) return false;
+        if (!areParenthesesValid(input)) return "Error: Parentheses are in an invalid format";
         
         // loop over terms
         for (int termNumber = 0; termNumber < inputTerms.length; termNumber++) {
             String term = inputTerms[termNumber];
             if (termNumber % 2 == 0){ // OPERAND TERMS
-                if (!isValidOperand(term)) return false;
+                if (!isValidOperand(term)) return String.format("Error: Invalid Operand %s", term);
             } else { // OPERATOR TERMS
-                if (!isValidOperator(term)) return false;
+                if (!isValidOperator(term)) return String.format("Error: Invalid Operator %s", term);
             }
         }
         // this line is reached only if all the terms are in a valid format
         // the following lines check for division by zero
         int[][] operands = extractOperands(input);
         char[] operators = extractOperators(input);
-        for (int[] operand : operands) if (operand[1] == 0) return false;
+        for (int i = 0; i < operands.length; i++) {
+            int[] operand = operands[i];
+            if (operand[1] == 0) {
+                return String.format("Error: denominator is zero for operand %s", inputTerms[i * 2]);
+            }
+        }
         for (int i = 0; i < operators.length; i++) {
-            if (operators[i] == '/' && operands[i + 1][0] == 0) return false;
+            if (operators[i] == '/' && operands[i + 1][0] == 0) return "Error: division by zero";
         }
         
-        return true; // if nothing raised an error, return true
+        return ""; // if nothing raised an error, return empty string
     }
     
     // Separated parentheses error handling for isValidOperation
