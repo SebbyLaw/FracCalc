@@ -5,6 +5,7 @@ Sebastian Law
 
 package fracCalc;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class FracCalc {
@@ -72,53 +73,52 @@ public class FracCalc {
      */
     private static String evaluateExpression(String expression) {
         char[][] priorityLevels = {{'*', '/'}, {'+', '-'}};
-        MixedNumber[] operands = extractOperands(expression);
-        char[] operators = extractOperators(expression);
-        // run over priority in order of operations
+        ArrayList<MixedNumber> operands = extractOperands(expression);
+        ArrayList<Character> operators = extractOperators(expression);
+        // iterate over priority in order of operations
         for (char[] priority : priorityLevels) {
-            for (int j = 0; j < operators.length; j++) {
-                if (charInArray(operators[j], priority)) {
-                    operands = doOperation(operands, operators, j);
-                    operators = removedIndex(operators, j--);
+            for (int j = 0; j < operators.size(); j++) {
+                if (charInArray(operators.get(j), priority)) {
+                    doOperation(operands, operators, j--);
                 }
             }
         }
-        return operands[0].toString();
+        return operands.get(0).toString();
     }
     
     /**
      * Does one operation. You must manually decrement the operators array
-     * @param operands the operands array
-     * @param operators the operators array
-     * @param index the index of the operator array to evaluate
-     * @return the updated operand array
+     * @param operands the operands ArrayList
+     * @param operators the operators ArrayList
+     * @param index the index of the operator ArrayList to evaluate
      */
-    private static MixedNumber[] doOperation(MixedNumber[] operands, char[] operators, int index){
-        char op = operators[index];
-        MixedNumber secondNum = operands[index + 1];
+    private static void doOperation(ArrayList<MixedNumber> operands, ArrayList<Character> operators, int index){
+        char op = operators.get(index);
+        MixedNumber secondNum = operands.get(index + 1);
         if (op == '*'){
-            operands[index].multiplyBy(secondNum);
+            operands.get(index).multiplyBy(secondNum);
         } else if (op == '/'){
-            operands[index].divideBy(secondNum);
+            operands.get(index).divideBy(secondNum);
         } else if (op == '+'){
-            operands[index].addedBy(secondNum);
+            operands.get(index).addedBy(secondNum);
         } else { // subtraction
-            operands[index].subtractedBy(secondNum);
+            operands.get(index).subtractedBy(secondNum);
         }
-        return removedIndex(operands, index + 1);
+        operands.remove(index + 1);
+        operators.remove(index);
     }
     
     /**
      * returns the operands of a string expression
      * @param expression the expression string
-     * @return an array of MixedNumbers within the expression representing operands
+     * @return an ArrayList of MixedNumbers within the expression representing operands
      */
-    private static MixedNumber[] extractOperands(String expression){
+    private static ArrayList<MixedNumber> extractOperands(String expression){
         String[] expressionTerms = expression.split(" ");
-        MixedNumber[] operands = new MixedNumber[expressionTerms.length / 2 + 1];
+        ArrayList<MixedNumber> operands = new ArrayList<>();
         for (int i = 0; i < expressionTerms.length; i++) {
             if (i % 2 == 0){
-                operands[i / 2] = new MixedNumber(expressionTerms[i]);
+                operands.add(new MixedNumber(expressionTerms[i]));
             }
         }
         return operands;
@@ -127,14 +127,14 @@ public class FracCalc {
     /**
      * returns the operators of a string expression
      * @param expression the expression string
-     * @return an array of chars within the expression representing operators
+     * @return an ArrayList of chars within the expression representing operators
      */
-    private static char[] extractOperators(String expression){
+    private static ArrayList<Character> extractOperators(String expression){
         String[] expressionTerms = expression.split(" ");
-        char[] operators = new char[expressionTerms.length / 2];
+        ArrayList<Character> operators = new ArrayList<>();
         for (int i = 0; i < expressionTerms.length; i++) {
             if (i % 2 == 1){
-                operators[i / 2] = (expressionTerms[i]).charAt(0);
+                operators.add((expressionTerms[i]).charAt(0));
             }
         }
         return operators;
@@ -170,34 +170,6 @@ public class FracCalc {
     }
     
     /**
-     * removes an index from an operand array
-     * @param fractionArray the operand array to edit
-     * @param index the index to remove
-     * @return a new array without the index
-     */
-    private static MixedNumber[] removedIndex(MixedNumber[] fractionArray, int index) {
-        MixedNumber[] shifted = new MixedNumber[fractionArray.length - 1];
-        for (int i = 0, j = 0; i < fractionArray.length; i++) {
-            if (i != index) shifted[j++] = fractionArray[i];
-        }
-        return shifted;
-    }
-    
-    /**
-     * removes an index from an operator array
-     * @param operatorArray the operator array to edit
-     * @param index the index to remove
-     * @return a new array without the index
-     */
-    private static char[] removedIndex(char[] operatorArray, int index){
-        char[] shifted = new char[operatorArray.length - 1];
-        for (int i = 0, j = 0; i < operatorArray.length; i++) {
-            if (i != index) shifted[j++] = operatorArray[i];
-        }
-        return shifted;
-    }
-    
-    /**
      * Checks whether a string expression is in valid FracCalc format
      * @param input the expression to parse
      * @return True if the expression is in a valid format
@@ -208,23 +180,25 @@ public class FracCalc {
         if (inputTerms.length % 2 == 0 || input.length() < 5) return false;
         // make sure the number of opening and closing parenthesis are equal
         if (!areParenthesesValid(input)) return false;
+        ArrayList<MixedNumber> operands = new ArrayList<>();
+        ArrayList<Character> operators = new ArrayList<>();
         
         // loop over terms
         for (int termNumber = 0; termNumber < inputTerms.length; termNumber++) {
             String term = inputTerms[termNumber];
             if (termNumber % 2 == 0){ // OPERAND TERMS
                 if (!isValidOperand(term)) return false;
+                operands.add(new MixedNumber(term));
             } else { // OPERATOR TERMS
                 if (!isValidOperator(term)) return false;
+                operators.add(term.charAt(0));
             }
         }
         // this line is reached only if all the terms are in a valid format
         // the following lines check for division by zero
-        MixedNumber[] operands = extractOperands(input);
-        char[] operators = extractOperators(input);
         for (MixedNumber operand : operands) if (operand.getDenominator() == 0) return false;
-        for (int i = 0; i < operators.length; i++) {
-            if (operators[i] == '/' && operands[i + 1].getNumerator() == 0) return false;
+        for (int i = 0; i < operators.size(); i++) {
+            if (operators.get(i) == '/' && operands.get(i + 1).getNumerator() == 0) return false;
         }
         
         return true; // if nothing raised an error, return true
