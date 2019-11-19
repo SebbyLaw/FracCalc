@@ -116,7 +116,7 @@ public class FracCalc {
      */
     private static ArrayList<Fraction> extractOperands(String expression){
         String[] expressionTerms = expression.split(" ");
-        ArrayList<Fraction> operands = new ArrayList<>();
+        ArrayList<Fraction> operands = new ArrayList<Fraction>();
         for (int i = 0; i < expressionTerms.length; i++) {
             if (i % 2 == 0){
                 operands.add(new Fraction(expressionTerms[i]));
@@ -132,7 +132,7 @@ public class FracCalc {
      */
     private static ArrayList<Character> extractOperators(String expression){
         String[] expressionTerms = expression.split(" ");
-        ArrayList<Character> operators = new ArrayList<>();
+        ArrayList<Character> operators = new ArrayList<Character>();
         for (int i = 0; i < expressionTerms.length; i++) {
             if (i % 2 == 1){
                 operators.add((expressionTerms[i]).charAt(0));
@@ -181,8 +181,8 @@ public class FracCalc {
         if (inputTerms.length % 2 == 0 || input.length() < 5) return "Error: Input is in an invalid format";
         // make sure the number of opening and closing parenthesis are equal
         if (!areParenthesesValid(input)) return "Error: Parentheses are in an invalid format";
-        ArrayList<Fraction> operands = new ArrayList<>();
-        ArrayList<Character> operators = new ArrayList<>();
+        ArrayList<Fraction> operands = new ArrayList<Fraction>();
+        ArrayList<Character> operators = new ArrayList<Character>();
         
         // loop over terms
         for (int termNumber = 0; termNumber < inputTerms.length; termNumber++) {
