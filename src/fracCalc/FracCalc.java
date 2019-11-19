@@ -5,6 +5,7 @@ Sebastian Law
 
 package fracCalc;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class FracCalc {
@@ -64,40 +65,41 @@ public class FracCalc {
      */
     private static String evaluateExpression(String expression) {
         char[][] priorityLevels = {{'*', '/'}, {'+', '-'}};
-        int[][] operands = extractOperands(expression);
-        char[] operators = extractOperators(expression);
+        ArrayList<int[]> operands = extractOperands(expression);
+        ArrayList<Character> operators = extractOperators(expression);
         // run over priority in order of operations
         for (char[] priority : priorityLevels) {
-            for (int j = 0; j < operators.length; j++) {
-                if (charInArray(operators[j], priority)) {
-                    operands = doOperation(operands, operators, j);
-                    operators = removedIndex(operators, j--);
+            for (int j = 0; j < operators.size(); j++) {
+                if (charInArray(operators.get(j), priority)) {
+                    doOperation(operands, operators, j--);
                 }
             }
         }
-        return toMixedNumberForm(operands[0]);
+        return toMixedNumberForm(operands.get(0));
     }
     
     /**
      * Does one operation. You must manually decrement the operators array
-     * @param operands the operands array
-     * @param operators the operators array
+     * @param operands the operands ArrayList
+     * @param operators the operators ArrayList
      * @param index the index of the operator array to evaluate
-     * @return the updated operand array
      */
-    private static int[][] doOperation(int[][] operands, char[] operators, int index){
-        char op = operators[index];
-        int[] secondOperand = operands[index + 1];
+    private static void doOperation(ArrayList<int[]> operands, ArrayList<Character> operators, int index){
+        char op = operators.get(index);
+        int[] secondOperand = operands.get(index + 1);
+        int[] answer;
         if (op == '*'){
-            operands[index] = doMultiplication(operands[index], secondOperand);
+            answer = doMultiplication(operands.get(index), secondOperand);
         } else if (op == '/'){
-            operands[index] = doDivision(operands[index], secondOperand);
+            answer = doDivision(operands.get(index), secondOperand);
         } else if (op == '+'){
-            operands[index] = doAddition(operands[index], secondOperand);
+            answer = doAddition(operands.get(index), secondOperand);
         } else { // subtraction
-            operands[index] = doSubtraction(operands[index], secondOperand);
+            answer = doSubtraction(operands.get(index), secondOperand);
         }
-        return removedIndex(operands, index + 1);
+        operands.set(index, answer);
+        operands.remove(index + 1);
+        operators.remove(index);
     }
     
     // multiplies one number with another in the form of fraction arrays
@@ -141,24 +143,24 @@ public class FracCalc {
     }
     
     // returns the operands of a string expression
-    private static int[][] extractOperands(String expression){
+    private static ArrayList<int[]> extractOperands(String expression){
         String[] expressionTerms = expression.split(" ");
-        int[][] operands = new int[expressionTerms.length / 2 + 1][2];
+        ArrayList<int[]> operands = new ArrayList<int[]>();
         for (int i = 0; i < expressionTerms.length; i++) {
             if (i % 2 == 0){
-                operands[i / 2] = toFractionForm(expressionTerms[i]);
+                operands.add(toFractionForm(expressionTerms[i]));
             }
         }
         return operands;
     }
     
     // returns the operators of a string expression
-    private static char[] extractOperators(String expression){
+    private static ArrayList<Character> extractOperators(String expression){
         String[] expressionTerms = expression.split(" ");
-        char[] operators = new char[expressionTerms.length / 2];
+        ArrayList<Character> operators = new ArrayList<Character>();
         for (int i = 0; i < expressionTerms.length; i++) {
             if (i % 2 == 1){
-                operators[i / 2] = (expressionTerms[i]).charAt(0);
+                operators.add((expressionTerms[i]).charAt(0));
             }
         }
         return operators;
@@ -245,24 +247,6 @@ public class FracCalc {
         return string;
     }
     
-    // removes an index from a operand array
-    private static int[][] removedIndex(int[][] fractionArray, int index) {
-        int[][] shifted = new int[fractionArray.length - 1][2];
-        for (int i = 0, j = 0; i < fractionArray.length; i++) {
-            if (i != index) shifted[j++] = fractionArray[i];
-        }
-        return shifted;
-    }
-    
-    // removes an index from a operator array
-    private static char[] removedIndex(char[] operatorArray, int index){
-        char[] shifted = new char[operatorArray.length - 1];
-        for (int i = 0, j = 0; i < operatorArray.length; i++) {
-            if (i != index) shifted[j++] = operatorArray[i];
-        }
-        return shifted;
-    }
-    
     // Checks if a string is only integers
     private static boolean isOnlyIntegers(String string){
         if (string.length() == 0) return false; // cannot start as an empty string
@@ -281,27 +265,30 @@ public class FracCalc {
         // make sure the number of opening and closing parenthesis are equal
         if (!areParenthesesValid(input)) return "Error: Parentheses are in an invalid format";
         
+        ArrayList<int[]> operands = new ArrayList<int[]>();
+        ArrayList<Character> operators = new ArrayList<Character>();
+        
         // loop over terms
         for (int termNumber = 0; termNumber < inputTerms.length; termNumber++) {
             String term = inputTerms[termNumber];
             if (termNumber % 2 == 0){ // OPERAND TERMS
                 if (!isValidOperand(term)) return String.format("Error: Invalid Operand %s", term);
+                operands.add(toFractionForm(term));
             } else { // OPERATOR TERMS
                 if (!isValidOperator(term)) return String.format("Error: Invalid Operator %s", term);
+                operators.add(term.charAt(0));
             }
         }
         // this line is reached only if all the terms are in a valid format
         // the following lines check for division by zero
-        int[][] operands = extractOperands(input);
-        char[] operators = extractOperators(input);
-        for (int i = 0; i < operands.length; i++) {
-            int[] operand = operands[i];
+        for (int i = 0; i < operands.size(); i++) {
+            int[] operand = operands.get(i);
             if (operand[1] == 0) {
                 return String.format("Error: denominator is zero for operand %s", inputTerms[i * 2]);
             }
         }
-        for (int i = 0; i < operators.length; i++) {
-            if (operators[i] == '/' && operands[i + 1][0] == 0) return "Error: division by zero";
+        for (int i = 0; i < operators.size(); i++) {
+            if (operators.get(i) == '/' && operands.get(i + 1)[0] == 0) return "Error: division by zero";
         }
         
         return ""; // if nothing raised an error, return empty string
