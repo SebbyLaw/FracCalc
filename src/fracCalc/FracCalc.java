@@ -1,6 +1,6 @@
 /*
 Sebastian Law
-2019.11.17
+2019.11.19
  */
 
 package fracCalc;
