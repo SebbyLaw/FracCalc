@@ -246,9 +246,8 @@ public class FracCalc {
      */
     private static boolean isOnlyIntegers(String string){
         if (string.length() == 0) return false; // cannot start as an empty string
-        char[] integers = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         for (char c : string.toCharArray()){
-            if (!charInArray(c, integers)) return false;
+            if (Character.isDigit(c)) return false;
         }
         return true;
     }
