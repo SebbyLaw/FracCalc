@@ -34,16 +34,6 @@ public class Fraction {
     }
     
     /**
-     * Creates a Fraction in the numerator/denominator format
-     * @param numerator the numerator
-     * @param denominator the denominator
-     */
-    public Fraction(int numerator, int denominator){
-        this.numerator = numerator;
-        this.denominator = denominator;
-    }
-    
-    /**
      * Directly multiplies (similar to *=) a Fraction by another
      * @param factor the Fraction to multiply by
      */
