@@ -27,3 +27,8 @@ hs_err_pid*
 out/production/FracCalc/META-INF/
 src/.DS_Store
 src/fracCalc/.DS_Store
+
+.classpath
+.project
+FracCalc.eml
+FracCalc.userlibraries
