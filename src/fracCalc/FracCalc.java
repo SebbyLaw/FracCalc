@@ -95,18 +95,22 @@ public class FracCalc {
      */
     private static void doOperation(ArrayList<Fraction> operands, ArrayList<Character> operators, int index){
         char op = operators.get(index);
+        Fraction firstNum = operands.get(index);
         Fraction secondNum = operands.get(index + 1);
+        Fraction answer;
         if (op == '*'){
-            operands.get(index).multiplyBy(secondNum);
+            answer = Fraction.multiply(firstNum, secondNum);
         } else if (op == '/'){
-            operands.get(index).divideBy(secondNum);
+            answer = Fraction.divide(firstNum, secondNum);
         } else if (op == '+'){
-            operands.get(index).addedBy(secondNum);
+            answer = Fraction.add(firstNum, secondNum);
         } else { // subtraction
-            operands.get(index).subtractedBy(secondNum);
+            answer = Fraction.subtract(firstNum, secondNum);
         }
         operands.remove(index + 1);
         operators.remove(index);
+        
+        operands.set(index, answer);
     }
     
     /**

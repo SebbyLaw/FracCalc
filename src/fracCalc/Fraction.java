@@ -34,42 +34,83 @@ public class Fraction {
     }
     
     /**
-     * Directly multiplies (similar to *=) a Fraction by another
-     * @param factor the Fraction to multiply by
+     * Constructor for only one whole number
+     * @param wholeNumber the whole number
      */
-    public void multiplyBy(Fraction factor){
-        this.numerator *= factor.numerator;
-        this.denominator *= factor.denominator;
+    public Fraction(int wholeNumber){
+        this.numerator = wholeNumber;
+        this.denominator = 1;
     }
     
     /**
-     * Directly divides (similar to /=) a Fraction by another
-     * @param divisor the Fraction to divide by
+     * Constructor for numerator and denominator
+     * @param numerator the numerator
+     * @param denominator the denominator
      */
-    public void divideBy(Fraction divisor){
-        this.numerator *= divisor.denominator;
-        this.denominator *= divisor.numerator;
+    public Fraction(int numerator, int denominator){
+        this.numerator = numerator;
+        this.denominator = denominator;
     }
     
     /**
-     * Directly adds (similar to +=) a Fraction to another
-     * @param addend the Fraction to add
+     * Constructor for mixed number with known values
+     * @param wholeNumber he whole number
+     * @param numerator the numerator
+     * @param denominator the denominator
      */
-    public void addedBy(Fraction addend){
-        int firstNumerator = this.numerator * addend.denominator;
-        int secondNumerator = addend.numerator * this.denominator;
-    
-        this.numerator = firstNumerator + secondNumerator;
-        this.denominator *= addend.denominator;
+    public Fraction(int wholeNumber, int numerator, int denominator){
+        this.denominator = denominator;
+        this.numerator = numerator + (wholeNumber * denominator);
     }
     
     /**
-     * Directly subtracts (similar to -=) a Fraction by another
-     * @param subtrahend the Fraction to subtract by
+     * Multiplies two Fractions by each other and returns a new Fraction with the result
+     * @param factor1 the first Fraction to multiply
+     * @param factor2 the second Fraction to multiply
      */
-    public void subtractedBy(Fraction subtrahend){
-        subtrahend.numerator *= -1;
-        this.addedBy(subtrahend);
+    public static Fraction multiply(Fraction factor1, Fraction factor2){
+        int numerator = factor1.numerator * factor2.numerator;
+        int denominator = factor1.denominator * factor2.denominator;
+        
+        return new Fraction(numerator, denominator);
+    }
+    
+    /**
+     * Divides one Fraction by another and returns a new Fraction with the result
+     * @param dividend the dividend of the equation
+     * @param divisor the divisor of the equation
+     */
+    public static Fraction divide(Fraction dividend, Fraction divisor){
+        int numerator = dividend.numerator * divisor.denominator;
+        int denominator = dividend.denominator * divisor.numerator;
+        
+        return new Fraction(numerator, denominator);
+    }
+    
+    /**
+     * Adds two Fractions to each other and returns a new Fraction with the result
+     * @param addend1 the first Fraction to add
+     * @param addend2 the second Fraction to add
+     */
+    public static Fraction add(Fraction addend1, Fraction addend2){
+        int firstNumerator = addend1.numerator * addend2.denominator;
+        int secondNumerator = addend2.numerator * addend1.denominator;
+    
+        int numerator = firstNumerator + secondNumerator;
+        int denominator = addend1.denominator * addend2.denominator;
+        
+        return new Fraction(numerator, denominator);
+    }
+    
+    /**
+     * Subtracts one Fraction from another and returns a new Fraction with the result
+     * @param minuend the minuend of the equation
+     * @param subtrahend the subtrahend of the equation
+     */
+    public static Fraction subtract(Fraction minuend, Fraction subtrahend){
+        // Just addition but negative
+        Fraction negativeSub = new Fraction(subtrahend.numerator * -1, subtrahend.denominator);
+        return add(minuend, negativeSub);
     }
     
     /**
